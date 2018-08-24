@@ -1,2 +1,2 @@
-model_checkpoint_path: "E:\\Github\\CNN_tensorflow_180726\\data\\ckpt\\mnist.ckpt-1"
-all_model_checkpoint_paths: "E:\\Github\\CNN_tensorflow_180726\\data\\ckpt\\mnist.ckpt-1"
+model_checkpoint_path: "E:\\Github\\Radar_RNN\\ckpt\\mnist.ckpt-999"
+all_model_checkpoint_paths: "E:\\Github\\Radar_RNN\\ckpt\\mnist.ckpt-999"
