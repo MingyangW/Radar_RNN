@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Aug 23 17:11:26 2018
+Created on Tue Aug 28 11:10:24 2018
 
 @author: mingyang.wang
 """
@@ -51,7 +51,7 @@ def get_data(file, col):
 
 #遍历AD数据文件，加载带标签数据
 def get_data2(filepath, col):
-    label_dict = {"9710":0, "9725":1, "9800":2, "9870":3}
+#    label_dict = {"9710":0, "9725":1, "9800":2, "9870":3}
     col_list = [i for i in range(col)]
     row_data = 5000
     label = []
@@ -59,6 +59,7 @@ def get_data2(filepath, col):
     datas = np.zeros((1, col*row_data))
     if os.path.exists(filepath):
         pathDir = os.listdir(filepath)  #进入文件目录
+        label_dict = {i:j for i,j in zip(pathDir, range(len(pathDir)))}
         for allDir in range(len(pathDir)):
             childDir = os.path.join('%s\\%s' % (filepath, pathDir[allDir]))
             pathfile = os.listdir(childDir)
@@ -76,7 +77,7 @@ def get_data2(filepath, col):
                         data_sign = 0
                     else:
                         datas = np.row_stack((datas, data))
-                    label.append(label_dict[pathDir[allDir][-4:]])
+                    label.append(label_dict[pathDir[allDir]])
         labels = np.array(label)
         return datas, labels
     else:
@@ -185,42 +186,42 @@ def RNN_model(data, label, batch_size, n_classes, n_inputs, n_steps, is_train=Tr
             print("test_data num: %d , Accuracy: %.4f" % (n_batch * batch_size, result))
 
 if __name__ == "__main__":
-    filepath_train = "E:\\data\\leida"  #原始AD数据存放地址
-    filepath_test = "E:\\data\\leida3"  #原始AD数据存放地址
+    file_path_train = "E:\\data\\leida"  #原始AD数据存放地址
+    file_path_test = "E:\\data\\leida3"  #原始AD数据存放地址
     file_path = "E:\\data\\radar4"
     data_row_num = 200  #RNN识别脉冲数据结构，行
     data_col_num = 200  #RNN识别脉冲数据结构，列
-    train_batch = 1   #训练批次数据量
+    batch_size = 1   #训练批次数据量
     AD_col = 8  #原始aD数据有效数列
     n_class = 4  #类别数量
-    training_iter = 10000
-    train = False
+    train_iter = 10000
+    is_train = False
     
     files=[]
-    get_file_name(filepath_train) 
-#    print(files)
-#    files = get_file_name(filepath_test)
-#    datas, labels = get_data(files, AD_col)
-    datas, labels = get_data2(file_path, AD_col)
-    datas = datas.reshape((datas.shape[0], data_row_num, data_col_num))
-    labels_onehot = make_one_hot(labels, n_class)
-#    print(labels_onehot)
-#    print(datas.shape)
+#    get_file_name(file_path_train) 
+#    get_file_name(file_path_test)
+#    AD_data, AD_label = get_data(files, AD_col)
+    AD_data, AD_label = get_data2(file_path, AD_col)
+    AD_data_reshape = AD_data.reshape((AD_data.shape[0], data_row_num, data_col_num))
+    AD_label_onehot = make_one_hot(AD_label, n_class)
     
-    train_data, test_data, train_label, test_label = train_test_split(datas, labels_onehot, test_size=0.7, random_state=0)
+    AD_train_data, AD_test_data, AD_train_label, AD_test_label = train_test_split(AD_data, AD_label_onehot, test_size=0.7, random_state=0)
     std = StandardScaler()
-#    train_data_std = std.fit_transform(train_data)
-#    test_data_std = std.transform(test_data)
-#    print(train_data.shape, test_data.shape, train_label.shape, test_label.shape)
+    AD_train_data_std = std.fit_transform(AD_train_data)
+    AD_test_data_std = std.transform(AD_test_data)
+    AD_train_data_std = AD_train_data_std.reshape((AD_train_data_std.shape[0], data_row_num, data_col_num))
+    AD_test_data_std = AD_test_data_std.reshape((AD_test_data_std.shape[0], data_row_num, data_col_num))
+    print(AD_train_data_std.shape, AD_test_data_std.shape, AD_train_label.shape, AD_test_label.shape)
+    
 
-    RNN_model(data = datas, 
-              label = labels_onehot, 
-              batch_size = train_batch, 
+    RNN_model(data = AD_data_reshape, 
+              label = AD_label_onehot, 
+              batch_size = batch_size, 
               n_classes = n_class, 
               n_inputs = data_col_num, 
               n_steps = data_row_num,
-              is_train = train,
-              training_iters = training_iter
+              is_train = is_train,
+              training_iters = train_iter
               )
 
         
